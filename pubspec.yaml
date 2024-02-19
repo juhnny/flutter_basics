@@ -42,6 +42,12 @@ dependencies:
 
   json_annotation:
 
+  http: ^1.2.0
+
+  dio: ^5.4.0
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
