@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_basics/naver_map/reverse_geocode_vo.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 // todo 이걸 노출하는 거 괜찮을까?
@@ -69,13 +71,75 @@ class _MyMapState extends State<MyMap>{
         print("${marker.subCaption}");
         print("${marker.position.latitude}");
         print("${marker.info.payload}");
+
         final onMarkerInfoWindow = NInfoWindow.onMarker(id: marker.info.id, text: "인포윈도우 텍스트");
         marker.openInfoWindow(onMarkerInfoWindow);
       });
 
       // 지도에 하나씩 추가
       mapController.addOverlay(marker1);
+
+      reverseGeocode(latLng);
     });
+  }
+
+  // 지오코드 API를 이용해 좌표를 주소로 변환한다.
+  Future<void> reverseGeocode(NLatLng latLng) async {
+    print('reverseGeocode');
+    var dio = Dio(BaseOptions(
+      baseUrl: "https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/",
+      connectTimeout: Duration(seconds: 5),
+      sendTimeout: Duration(seconds: 5),
+      receiveTimeout: Duration(seconds: 5),
+      headers: {
+        "X-NCP-APIGW-API-KEY-ID": 'f977punyhw',
+        "X-NCP-APIGW-API-KEY": '5btGyhinl8cfly7pU28SHWOTc3QPpOQmaIGZuhCw',
+      },
+    ));
+    dio.interceptors.add(LogInterceptor(
+        logPrint: (object){
+          debugPrint(object.toString());
+        }
+    ));
+    var response = await dio.get(
+      'gc',
+      queryParameters: {
+        'request': "coordsToaddr",
+        'coords': "${latLng.longitude},${latLng.latitude}",
+        'sourcecrs': "epsg:4326",
+        'orders': "addr,roadaddr",
+        'output': "json",
+      }
+    );
+    String result = response.data.toString();
+    print(result);
+
+    if(response.statusCode == 200) {
+      ReverseGeocodeResponse reverseGcResponse = ReverseGeocodeResponse.fromJson(response.data);
+
+      for(ReverseGeocodeVO reverseGeocodeVO in reverseGcResponse.results) {
+        if(reverseGeocodeVO.name == "addr"){ // 지번 주소
+          String sido = reverseGeocodeVO.region.area1.name; // 시도
+          String sigungu = reverseGeocodeVO.region.area2.name; // 시군구
+          String eupmyeondong = reverseGeocodeVO.region.area3.name; // 읍면동
+          String ri = reverseGeocodeVO.region.area4.name; // 리
+          String num1 = reverseGeocodeVO.land.number1; // 토지 본번호
+          String? num2 = reverseGeocodeVO.land.number2; // 토지 부번호
+          String addr = "$sido $sigungu $eupmyeondong $ri".trim();
+          String beonji = "$num1 $num2".trim();
+          print('지번주소: $addr $beonji');
+
+        } else if(reverseGeocodeVO.name == "roadaddr"){ // 도로명 주소
+          String sido = reverseGeocodeVO.region.area1.name; // 시도
+          String sigungu = reverseGeocodeVO.region.area2.name; // 시군구
+          String? roadName = reverseGeocodeVO.land.name; // 토지 본번호
+          String roadNameDatail = reverseGeocodeVO.land.number1; // 토지 부번호
+          String roadAddr = "$sido $sigungu $roadName $roadNameDatail".trim();
+          print('도로명주소: $roadAddr');
+        }
+      }
+
+    }
   }
 
   @override
@@ -107,7 +171,7 @@ class _MyMapState extends State<MyMap>{
             mapController = controller;
           },
           onMapTapped: (point, latLng) {
-            print('onMapTapped - point: ${point.payload}, latLng: ${latLng.latitude}, ${latLng.latitude}');
+            print('onMapTapped - point: ${point.payload}, latLng: ${latLng.latitude}, ${latLng.longitude}');
             createMarker(latLng);
             // createMarkers();
 

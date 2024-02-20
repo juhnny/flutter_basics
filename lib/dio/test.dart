@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   try{
-                    // request 메소드를 이용하고 방식은 op
+                    // request 메소드를 이용하고 방식은 options로 지정할 수도 있다.
                     var response = await Dio().request(
                       'https://reqres.in/api/users',
                        data :{
