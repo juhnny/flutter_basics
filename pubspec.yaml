@@ -56,6 +56,8 @@ dependencies:
 
   provider: ^6.1.1
 
+  flutter_riverpod: ^2.4.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,6 +73,9 @@ dev_dependencies:
 
   json_serializable: ^6.7.1
   build_runner:
+
+  custom_lint:
+#  riverpod_lint: ^2.3.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
