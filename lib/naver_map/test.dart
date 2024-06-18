@@ -76,8 +76,12 @@ class _MyMapState extends State<MyMap>{
         marker.openInfoWindow(onMarkerInfoWindow);
       });
 
+      final marker2 = NMarker(id: '2', position: latLng);
+      marker2.setIcon(NOverlayImage.fromAssetImage('images/big.jpeg'));
+
       // 지도에 하나씩 추가
       mapController.addOverlay(marker1);
+      mapController.addOverlay(marker2);
 
       reverseGeocode(latLng);
     });
