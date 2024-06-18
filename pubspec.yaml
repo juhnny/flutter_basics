@@ -58,6 +58,8 @@ dependencies:
 
   flutter_riverpod: ^2.4.10
 
+  fluttertoast: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
