@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 // Provider Observer
 // ProviderObserver 는 ProviderContainer 의 변화를 관찰하여, provider 의 상태를 모니터링 할 수 있게 해줍니다. providerObserver 를 통해 현재 앱에서 사용되는 상태(state)들을 모니터링 할 수 있고, 문제 발생시 원인을 파악하는데 도움을 줄 수 있다
@@ -9,18 +10,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // didAddProvider : provider 가 초기화 될때 마다 호출
 // didDisposeProvider : provider 가 Dispose 될때 마다 호출
 // didUpdateProvider : provider 값이 변경 될때 마다 호출
-class Logger extends ProviderObserver {
+final class Logger extends ProviderObserver {
   @override
   void didUpdateProvider(
-      ProviderBase provider,
+      ProviderObserverContext context,
       Object? previousValue,
       Object? newValue,
-      ProviderContainer container,
       ) {
     print('''
 {
-  "provider": "${provider.name ?? provider.runtimeType}",
-  "newValue": "$newValue"
+  "provider": "${context.provider}",
+  "newValue": "$newValue",
+  "mutation": "${context.mutation}"
 }''');
   }
 
